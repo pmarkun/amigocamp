@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Barcamp - happy hour conferences!</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://meet.jit.si/external_api.js"></script>
+<script>
+
+
+function getParticipants() {
+    var participants = []
+    $.each(api._participants, function (x,p) {
+            participants.push(p.displayName)
+        })
+    return participants;
+    }
+
+function changeRoom(room) {
+    options['roomName'] = room;
+    api.executeCommand('hangup');
+    api.dispose()
+    api = new JitsiMeetExternalAPI(domain, options);
+    api.executeCommand({
+        'displayName' : displayName,
+        toggleTileView : [],}
+        );
+
+    $(".mesa").removeClass("selected");
+    $("#"+room).addClass("selected");
+    $("#"+room+ " .participantes").textContent = getParticipants(api).join(', ');
+    return api
+        }
+
+$(document).ready(function(){
+    //displayName = prompt("What is your name?", "Harry Potter");
+    displayName = 'Harry Potter';
+    domain = "meet.jit.si";
+    room = "barcamp_mesa1"
+    options = {
+        roomName: room,
+		width: 1280,
+		height: 700,
+		parentNode: document.querySelector('#meet')
+	}
+    api = new JitsiMeetExternalAPI(domain, options);
+    $("#"+room+ " .participantes")[0].textContent = getParticipants().join(', ');
+    $('#rooms button').click(this, function (){
+        console.log(this)
+        room = this.parentNode.id;
+        api = changeRoom(room);
+        $("#"+room+ " .participantes")[0].textContent = getParticipants().join(', ');
+
+    });
+});
+
+</script>
+
+<style>
+
+    .mesa {
+        float:left;
+        width:300px;
+    }
+
+    .selected { 
+        border:1px solid red;
+    }
+</style>
+
+</head>
+<body>
+<h1>Barcamp</h1>
+<div id="meet">
+</div>
+
+<div id="control">
+    <div id="me">
+        <input id="nick" type="text">
+        <button id="chageNick">Trocar apelido</button>
+    </div>
+    <div id="rooms">
+        <div id="barcamp_mesa1" class="mesa selected">
+            <p>Mesa 1</p>
+            <p><b>Participantes:</b> <span class="participantes"></span></p>
+            <button id="barcamp_mesa1_btn">Entrar</button>
+        </div>
+        <div id="barcamp_mesa2" class="mesa">
+                <p>Mesa 2</p>
+                <p><b>Participantes:</b> <span class="participantes"></span></p>
+                <button id="barcamp_mesa2_btn">Entrar</button>
+            </div>    
+    </div>
+</div>
+
+<p></p>
+</body>
+</html>
